@@ -467,9 +467,18 @@ if __name__ == '__main__':
         main()
         sys.exit(0)
     
-    schedule.every().friday.at("12:00").do(main)
+    schedule.every().day.at("12:00").do(main)
 
     while True:
         logger.info(f"检测定时任务")
+        
+        today = datetime.date.today()
+        start_day = today-datetime.timedelta(days=7)
+
+        logger.debug(f"{start_day}-{end_day}")
+
+        start_time = int(time.mktime(start_day.timetuple()))
+        end_time = int(time.mktime(today.timetuple())) - 1
+        end_day = str(datetime.datetime.fromtimestamp(end_time))[:10]
         schedule.run_pending()
-        time.sleep(60)
+        time.sleep(3)
