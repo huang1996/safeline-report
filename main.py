@@ -448,7 +448,12 @@ def get_logger(name):
 if __name__ == '__main__':
     logger = get_logger(__name__)
     WQY_FONT_PATH = '/usr/share/fonts/truetype/wqy/wqy-microhei.ttc'
-
+    
+    if not os.path.exists('./logs'):
+        os.mkdir('./logs')
+    if not os.path.exists('./report'):
+        os.mkdir('./report')
+    
     if os.path.exists(WQY_FONT_PATH):
         matplotlib.rcParams['font.sans-serif'] = ['WenQuanYi Micro Hei']
         matplotlib.rcParams['axes.unicode_minus'] = False
