@@ -1,0 +1,8 @@
+.vscode
+venv
+Dockerfile*
+report/*
+template/*
+logs/*
+fonts
+entrypoint.sh
