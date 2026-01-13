@@ -347,6 +347,8 @@ def custom_add_paragraph(doc, tpl):
 
 def main():
     logger.info(f"任务触发")
+    if not os.path.exists('./report'):
+        os.mkdir('./report')
     logger.debug(f"数据库连接信息：{config['database_url']}")
     conn = psycopg2.connect(config['database_url'])
     try:
@@ -414,6 +416,8 @@ def main():
 
 
 def get_logger(name):
+    if not os.path.exists('./logs'):
+        os.mkdir('./logs')
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
     
@@ -448,11 +452,6 @@ def get_logger(name):
 if __name__ == '__main__':
     logger = get_logger(__name__)
     WQY_FONT_PATH = '/usr/share/fonts/truetype/wqy/wqy-microhei.ttc'
-    
-    if not os.path.exists('./logs'):
-        os.mkdir('./logs')
-    if not os.path.exists('./report'):
-        os.mkdir('./report')
     
     if os.path.exists(WQY_FONT_PATH):
         matplotlib.rcParams['font.sans-serif'] = ['WenQuanYi Micro Hei']
