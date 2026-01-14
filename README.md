@@ -9,7 +9,9 @@
     restart: always
     image: huangtao1996/safeline-report
     environment:
-      - DATABASE_URL=postgres://safeline-ce:${POSTGRES_PASSWORD}@safeline-pg/safeline-ce?sslmode=disable
+      #- DATABASE_URL=postgres://safeline-ce:${POSTGRES_PASSWORD}@safeline-pg/safeline-ce?sslmode=disable
+      # 如果密码中有特殊字符请使用下面的连接字符串
+      - DATABASE_URL=postgresql://safeline-pg/safeline-ce?user=safeline-ce&password=${POSTGRES_PASSWORD}&sslmode=disable
       - PROJECT_NAME=项目名称
       - REPORT_ONWER=报告审核人
       - WEBDAV_HOSTNAME=webdav主机地址
