@@ -17,6 +17,12 @@
       - WEBDAV_HOSTNAME=webdav主机地址
       - WEBDAV_LOGIN=webdav密码
       - WEBDAV_PASSWORD=webdav密码
+      # 需排除的APP_ID,使用，号分隔，可选
+      - EXCEPT_APP_IDS=3
+      # 需排除的IP，使用,号分隔，可选
+      - EXCEPT_IPS=218.88.215.93
+      # 日志等级，可选
+      - LOG_LEVEL=DEBUG
     networks:
       safeline-ce:
         ipv4_address: ${SUBNET_PREFIX}.20
