@@ -41,6 +41,7 @@ def __render_table_with_data(doc, columns, rows):
 
 def __query_data_from_db(cursor, sql):
     try:
+        logger.debug(sql)
         cursor.execute(sql)
         columns = [desc[0] for desc in cursor.description]
         rows = cursor.fetchall()
@@ -64,17 +65,38 @@ def __get_attack_type_name(rows, index):
 
 def get_total(doc, conn):
     sql = f"""
-        select 
-        coalesce(sum(case when mss."type"='website-req' then mss.value end)::int, 0) as 访问总数,
-        coalesce(sum(case when mss."type"='website-denied' then mss.value end)::int, 0) as 拦截总数,
-        (select count(*) as 黑名单拦截数 from mgt_rule_detect_log_basic mrdlb where mrdlb.attack_type=-3 and mrdlb."timestamp" >= {start_time} and mrdlb."timestamp" <= {end_time}),
-        (select count(*) as 未拦截数 from mgt_detect_log_basic mdlb where mdlb."action" =0 and mdlb."timestamp" >= {start_time} and mdlb."timestamp" <= {end_time}) 
-        from 
-        mgt_system_statistics mss 
-        where 
-        mss.created_at >= '{start_day}'
-            and 
+        select
+            coalesce(sum(case when mss."type" = 'website-req' then mss.value end)::int, 0) as 访问总数,
+            coalesce(sum(case when mss."type" = 'website-denied' then mss.value end)::int, 0) as 拦截总数,
+            (
+            select
+                count(*) as 黑名单拦截数
+            from
+                mgt_rule_detect_log_basic mrdlb
+            where
+                mrdlb.attack_type =-3
+                and mrdlb."timestamp" >= {start_time}
+                and mrdlb."timestamp" <= {end_time}
+                {f"and mrdlb.site_uuid not in({','.join(config.get('except_app_ids', []))})" if len(config.get('except_app_ids', []))>0 else ''}
+                ),
+            (
+            select
+                count(*) as 未拦截数
+            from
+                mgt_detect_log_basic mdlb
+            where
+                mdlb."action" = 0
+                and mdlb."timestamp" >= {start_time}
+                and mdlb."timestamp" <= {end_time}
+                {f"and mdlb.site_uuid not in ({','.join(config.get('except_app_ids', []))})" if len(config.get('except_app_ids', []))>0 else ''}
+                )
+        from
+            mgt_system_statistics mss
+        where
+            mss.created_at >= '{start_day}'
+            and
         mss.created_at <= '{end_day}'
+        {f"and mss.website not in ({','.join(config.get('except_app_ids', []))})" if len(config.get('except_app_ids', []))>0 else ''}
         """
     
     columns, rows = __query_data_from_db(conn.cursor(), sql)
@@ -95,8 +117,10 @@ def get_defens_apps(doc, conn):
             mgt_website mw
         left join mgt_system_statistics mss on
             mw.id = mss.website::bigint
-            and mss.created_at >= '{start_day}'
+            where
+            mss.created_at >= '{start_day}'
             and mss.created_at <= '{end_day}'
+            {f"and mw.id not in ({','.join(config.get('except_app_ids', []))})" if len(config.get('except_app_ids', []))>0 else ''}
         group by
             mw.id,
             mw."comment",
@@ -156,6 +180,7 @@ def get_access_total_by_ips(doc, conn):
         si."time" <= {end_time}
             and 
         si.attack_type = -1
+        {f"and si.key not in ({','.join(config.get('except_ips', []))})" if len(config.get('except_ips', [])) > 0 else ''}
         group by si."key",si.attack_type
         order by 访问次数 desc,si.key
         limit 10
@@ -183,6 +208,7 @@ def get_attack_total_by_ips(doc,conn):
         si."time" <= {end_time}
             and
         si.attack_type > 0
+        {f"and si.key not in ({','.join(config.get('except_ips', []))})" if len(config.get('except_ips', [])) > 0 else ''}
         group by si."key",si.attack_type
         order by 攻击次数 desc,si.key
         limit 10
@@ -209,6 +235,7 @@ def get_attack_total_by_type(doc,conn):
         si."time" <= {end_time}
             and
         si.attack_type > 0 
+        {f"and si.key not in ({','.join(config.get('except_ips', []))})" if len(config.get('except_ips', [])) > 0 else ''}
         group by si.attack_type
         order by 攻击次数 desc
         """
@@ -260,6 +287,7 @@ def get_not_defens_log(doc,conn):
     mdlb."timestamp" <= {end_time}
     and
     mdlb."action" = 0
+    {f"and mdlb.site_uuid not in ({','.join(config.get('except_app_ids', []))})" if len(config.get('except_app_ids', []))>0 else ''}
     """
     columns, rows = __query_data_from_db(conn.cursor(), sql)
     if len(rows) <= 0:
