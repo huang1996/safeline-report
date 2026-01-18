@@ -447,7 +447,7 @@ def get_logger(name):
     if not os.path.exists('./logs'):
         os.mkdir('./logs')
     logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(config.get('log_level'))
     
     # 如果已经配置过，直接返回
     if logger.handlers:

@@ -48,6 +48,7 @@ config = {
     "database_url": env.get("database_url"),
     'except_app_ids': except_app_ids,
     'except_ips': except_ips,
+    'log_level': os.environ.get('LOG_LEVEL', 'INFO').upper(),
     "webdav_options" : {
         "webdav_hostname": env.get("webdav_hostname"),
         "webdav_login":    env.get("webdav_login"),
