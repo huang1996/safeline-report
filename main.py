@@ -429,7 +429,7 @@ def main():
     try:
         if os.path.exists(local_file_path):
             client = Client(config.get("webdav_options"))
-            remote_base_path = f'report/{config.get("report_onwer")}'
+            remote_base_path = f'report/{config.get("report_onwer")}/{str(today).replace("-", "")}'
             remote_file_path = f'{remote_base_path}/{doc_filename}'
             client.mkdir(remote_base_path)
             client.upload_sync(remote_path=remote_file_path, local_path=local_file_path)
