@@ -117,10 +117,9 @@ def get_defens_apps(doc, conn):
             mgt_website mw
         left join mgt_system_statistics mss on
             mw.id = mss.website::bigint
-            where
-            mss.created_at >= '{start_day}'
+            and mss.created_at >= '{start_day}'
             and mss.created_at <= '{end_day}'
-            {f"and mw.id not in ({','.join(config.get('except_app_ids', []))})" if len(config.get('except_app_ids', []))>0 else ''}
+            {f"where mw.id not in ({','.join(config.get('except_app_ids', []))})" if len(config.get('except_app_ids', []))>0 else ''}
         group by
             mw.id,
             mw."comment",
