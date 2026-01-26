@@ -33,6 +33,7 @@ jobs:
       uses: docker/metadata-action@v5
       with:
         images: ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
+        # 根据 Git 标签生成 Docker 标签
         tags: |
           type=ref,event=tag
           type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
