@@ -34,7 +34,8 @@ jobs:
       with:
         images: ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
         tags: |
-          type=raw,value=latest
+          type=ref,event=tag
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
 
     - name: Build and push
       uses: docker/build-push-action@v5
